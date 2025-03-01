@@ -40,3 +40,5 @@ Thumbs.db
 convertmd.sh
 *~
 *.bak
+
+run-webmd-converter.sh
