@@ -47,16 +47,18 @@ CURRENT_DIR=$(pwd)
 # スクリプトに実行権限を付与
 chmod +x webmd_converter.py
 
-# インストールの確認
-read -p "システムのパスにインストールしますか？ (y/n): " INSTALL_CONFIRM
-if [[ "$INSTALL_CONFIRM" == "y" || "$INSTALL_CONFIRM" == "Y" ]]; then
-  # pipでインストール
-  pip install -e .
-  echo "pipを使って 'webmd-converter' をインストールしました"
-else
-  echo "システムへのインストールはスキップされました"
-  echo "当ディレクトリから仮想環境で実行できます: python webmd_converter.py --url <URL>"
-fi
+# 使用方法の説明
+cat > run-webmd-converter.sh << EOL
+#!/bin/bash
+# WebMD Converter 実行スクリプト
+source "${CURRENT_DIR}/venv/bin/activate"
+python "${CURRENT_DIR}/webmd_converter.py" "\$@"
+EOL
+chmod +x run-webmd-converter.sh
+
+echo "実行スクリプトを作成しました"
+echo "これで仮想環境のアクティベートなしで直接実行できます"
+echo "使用方法: ./run-webmd-converter.sh --url <URL>"
 
 # 出力ディレクトリの作成
 DEFAULT_OUTPUT_DIR=$(python3 -c "import os; print(os.path.expanduser('~/Documents/webmd_output'))")
@@ -75,17 +77,9 @@ echo "セットアップが完了しました！"
 echo "===================================="
 echo ""
 echo "使用方法:"
-if [[ "$INSTALL_CONFIRM" == "y" || "$INSTALL_CONFIRM" == "Y" ]]; then
-  echo "webmd-converter --url https://example.com"
-else
-  echo "python webmd_converter.py --url https://example.com"
-fi
+echo "./run-webmd-converter.sh --url https://example.com"
 echo ""
 echo "ヘルプの表示:"
-if [[ "$INSTALL_CONFIRM" == "y" || "$INSTALL_CONFIRM" == "Y" ]]; then
-  echo "webmd-converter -h"
-else
-  echo "python webmd_converter.py -h"
-fi
+echo "./run-webmd-converter.sh -h"
 echo ""
 echo "詳細な使用方法については README.md をご覧ください"

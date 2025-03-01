@@ -8,6 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 import html2text
 import os
+import sys
 from urllib.parse import urlparse
 import argparse
 
@@ -106,6 +107,13 @@ def main():
     """
     メイン実行関数 - コマンドラインから呼び出し可能
     """
+    if len(sys.argv) > 1 and sys.argv[1] == "--test":
+        # テストモード
+        import unittest
+        sys.argv.pop(1)  # --test引数を削除
+        unittest.main(module="tests")
+        return 0
+        
     args = parse_arguments()
     # 出力ディレクトリのパスを絶対パスに変換
     output_dir = os.path.expanduser(args.output_dir)

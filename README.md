@@ -24,9 +24,7 @@ chmod +x setup.sh
 ./setup.sh
 
 # 5. 使用例
-webmd-converter --url https://example.com
-# または仮想環境からの直接実行
-python webmd_converter.py --url https://example.com
+./run-webmd-converter.sh --url https://example.com
 ```
 
 ## 機能
@@ -79,34 +77,25 @@ chmod +x setup.sh
 セットアップスクリプトは以下の処理を行います:
 - Pythonの仮想環境の作成
 - 必要なパッケージのインストール
-- `webmd_converter.py`スクリプトの設定
+- `webmd_converter.py`スクリプトに実行権限を付与
+- 仮想環境を自動的にアクティベートする実行スクリプト（run-webmd-converter.sh）の作成
 - デフォルトの出力ディレクトリの作成
-
-途中で「システムのパスにインストールしますか？」と聞かれた場合:
-- `y`を選択するとpipを使って`webmd-converter`コマンドがグローバルに使えるようになります
-- `n`を選択した場合は、`python webmd_converter.py`で実行する必要があります
 
 ## 基本的な使い方
 
 1. **基本的な変換**:
 ```bash
-webmd-converter --url https://example.com
-# または直接実行
-python webmd_converter.py --url https://example.com
+./run-webmd-converter.sh --url https://example.com
 ```
 
 2. **出力先を指定して変換**:
 ```bash
-webmd-converter --url https://example.com --output-dir ~/my_markdown
-# または直接実行
-python webmd_converter.py --url https://example.com --output-dir ~/my_markdown
+./run-webmd-converter.sh --url https://example.com --output-dir ~/my_markdown
 ```
 
 3. **ヘルプの表示**:
 ```bash
-webmd-converter -h
-# または直接実行
-python webmd_converter.py -h
+./run-webmd-converter.sh -h
 ```
 
 ## 出力について
@@ -133,14 +122,14 @@ This domain is for use in illustrative examples...
 
 よくある問題と解決方法:
 
-1. **`webmd-converter: command not found`**
+1. **実行スクリプトのエラー**
 ```bash
-# パッケージがインストールされているか確認
-pip list | grep webmd-converter
-# グローバルにインストールしていない場合は、ローカルで実行
-python webmd_converter.py --url https://example.com
-# またはpipでインストール
-pip install -e .
+# 実行スクリプトが存在するか確認
+ls -la run-webmd-converter.sh
+# 実行権限を確認
+chmod +x run-webmd-converter.sh
+# 実行スクリプトが存在しない場合はセットアップを再実行
+./setup.sh
 ```
 
 2. **仮想環境のエラー**
@@ -149,8 +138,8 @@ pip install -e .
 ls -la venv
 # 仮想環境が存在しない場合は再作成
 python3 -m venv venv
-# 仮想環境をアクティベート
-source venv/bin/activate
+# 必要なパッケージを再インストール
+source venv/bin/activate && pip install -r requirements.txt
 ```
 
 3. **権限エラー**
@@ -176,16 +165,27 @@ chmod 755 ~/Documents/webmd_output
 - **出力先の変更**: `webmd_converter.py`の`--output-dir`パラメータを編集
 - **変換設定の変更**: `webmd_converter.py`の`url_to_markdown`関数を編集
 
-## pipでインストール（代替方法）
+## PyPIパッケージとしてリリース（開発者向け）
 
-PyPIからパッケージとしてインストールすることもできます:
+開発後、PyPIにパッケージをリリースする場合:
 
 ```bash
-# インストール
-pip install webmd-converter
+# ビルド
+pip install --upgrade build
+python -m build
 
-# 使用例
-webmd-converter --url https://example.com
+# アップロード（TestPyPIへ）
+pip install --upgrade twine
+python -m twine upload --repository testpypi dist/*
+
+# 本番PyPIへアップロード
+python -m twine upload dist/*
+```
+
+リリース後はpipでインストール可能になります:
+
+```bash
+pip install webmd-converter
 ```
 
 ## ライセンス
@@ -210,11 +210,11 @@ MIT License
 テストの実行方法:
 
 ```bash
-# 仮想環境をアクティベート
-source venv/bin/activate
+# テスト実行（自動的に仮想環境を使用）
+./run-webmd-converter.sh --test
 
-# ユニットテストの実行
-python -m unittest tests.py
+# または手動で
+./run-webmd-converter.sh -m unittest tests.py
 ```
 
 ## 作者

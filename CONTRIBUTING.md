@@ -23,7 +23,10 @@ source venv/bin/activate
 3. 開発後、変更をテストする
 ```bash
 # ローカルでの変換テスト
-python webmd_converter.py --url https://example.com
+./run-webmd-converter.sh --url https://example.com
+
+# テストの実行
+./run-webmd-converter.sh --test
 ```
 
 ## コーディング規約
