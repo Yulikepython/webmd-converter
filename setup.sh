@@ -8,9 +8,9 @@ PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.v
 PYTHON_MAJOR=$(echo $PYTHON_VERSION | cut -d'.' -f1)
 PYTHON_MINOR=$(echo $PYTHON_VERSION | cut -d'.' -f2)
 
-if [[ "$PYTHON_MAJOR" -lt 3 || ("$PYTHON_MAJOR" -eq 3 && "$PYTHON_MINOR" -lt 7) ]]; then
-  echo "エラー: Python 3.7以上が必要です。現在のバージョン: $PYTHON_VERSION"
-  echo "Python 3.7以上をインストールしてから再度実行してください。"
+if [[ "$PYTHON_MAJOR" -lt 3 || ("$PYTHON_MAJOR" -eq 3 && "$PYTHON_MINOR" -lt 8) ]]; then
+  echo "エラー: Python 3.8以上が必要です。現在のバージョン: $PYTHON_VERSION"
+  echo "Python 3.8以上をインストールしてから再度実行してください。"
   exit 1
 fi
 
