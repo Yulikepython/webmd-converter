@@ -14,7 +14,7 @@ Webページを簡単にMarkdownファイルに変換するコマンドライン
 # - pipがインストールされていること
 
 # 2. リポジトリのクローン
-git clone https://github.com/yulikepython/webmd-converter.git
+git clone https://github.com/Yulikepython/webmd-converter.git
 cd webmd-converter
 
 # 3. セットアップスクリプトに実行権限を付与
