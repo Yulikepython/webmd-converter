@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+"""
+WebMD Converter - Webページを簡単にMarkdownファイルに変換するツール
+MIT License - Copyright (c) 2024
+"""
+
 import requests
 from bs4 import BeautifulSoup
 import html2text
@@ -91,12 +97,15 @@ def parse_arguments():
     parser.add_argument('--url', type=str, required=True,
         help='変換したいWebページのURL')
     parser.add_argument('--output-dir', type=str,
-        default=os.path.expanduser('~/Documents/hp_to_md'),
-        help='出力先ディレクトリのパス (デフォルト: ~/Documents)')
+        default=os.path.expanduser('~/Documents/webmd_output'),
+        help='出力先ディレクトリのパス (デフォルト: ~/Documents/webmd_output)')
     return parser.parse_args()
 
 
-if __name__=="__main__":
+def main():
+    """
+    メイン実行関数 - コマンドラインから呼び出し可能
+    """
     args = parse_arguments()
     # 出力ディレクトリのパスを絶対パスに変換
     output_dir = os.path.expanduser(args.output_dir)
@@ -105,3 +114,8 @@ if __name__=="__main__":
         print(f"\n変換が完了しました。")
         print(f"出力ディレクトリ: {output_dir}")
         print(f"出力ファイル: {os.path.basename(output_file)}")
+    return 0
+
+
+if __name__=="__main__":
+    exit(main())

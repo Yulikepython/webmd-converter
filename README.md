@@ -1,20 +1,32 @@
-# HTML to Markdown Converter
+# WebMD Converter
 
 Webページを簡単にMarkdownファイルに変換するコマンドラインツールです。
 変換したファイルは自動的にローカルに保存され、メタデータ（タイトルとソースURL）も含まれます。
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://github.com/Yulikepython/webmd-converter/actions/workflows/tests.yml/badge.svg)](https://github.com/Yulikepython/webmd-converter/actions/workflows/tests.yml)
+
 ## クイックスタート
 
 ```bash
-# 1. リポジトリのクローン
-git clone https://github.com/yourusername/html-to-markdown.git
-cd html-to-markdown
+# 1. 前提条件
+# - Python 3.7以上がインストールされていること
+# - pipがインストールされていること
 
-# 2. 初期設定を実行
+# 2. リポジトリのクローン
+git clone https://github.com/yulikepython/webmd-converter.git
+cd webmd-converter
+
+# 3. セットアップスクリプトに実行権限を付与
+chmod +x setup.sh
+
+# 4. 初期設定を実行（仮想環境を作成し、依存パッケージをインストール）
 ./setup.sh
 
-# 3. 使用例
-convertmd --url https://example.com
+# 5. 使用例
+webmd-converter --url https://example.com
+# または仮想環境からの直接実行
+python webmd_converter.py --url https://example.com
 ```
 
 ## 機能
@@ -28,51 +40,82 @@ convertmd --url https://example.com
 
 - Python 3.7以上
 - pip (Pythonパッケージマネージャー)
-- Linux または macOS（Windowsは現在未対応）
+- bash シェル環境
+- 対応OS:
+  - **Linux**: 完全対応
+  - **macOS**: 完全対応
+  - **Windows**: 以下のいずれかの方法で対応
+    - [WSL (Windows Subsystem for Linux)](https://learn.microsoft.com/ja-jp/windows/wsl/install) を使用
+    - [Git Bash](https://gitforwindows.org/) を使用
+    - [Cygwin](https://www.cygwin.com/) を使用
 
 ## 詳細なインストール手順
 
-1. **リポジトリのクローン**:
+1. **環境の確認**:
 ```bash
-git clone https://github.com/yourusername/html-to-markdown.git
-cd html-to-markdown
+# Pythonバージョンの確認（3.7以上が必要）
+python3 --version
+
+# pipがインストールされていることを確認
+pip --version
 ```
 
-2. **setup.shの編集**:
+2. **リポジトリのクローン**:
 ```bash
-# 環境に合わせてパスを編集
-nano setup.sh
+git clone https://github.com/Yulikepython/webmd-converter.git
+cd webmd-converter
 ```
 
-3. **セットアップスクリプトの実行**:
+3. **セットアップスクリプトに実行権限を付与**:
 ```bash
 chmod +x setup.sh
+```
+
+4. **セットアップスクリプトの実行**:
+```bash
 ./setup.sh
 ```
+
+セットアップスクリプトは以下の処理を行います:
+- Pythonの仮想環境の作成
+- 必要なパッケージのインストール
+- `webmd_converter.py`スクリプトの設定
+- デフォルトの出力ディレクトリの作成
+
+途中で「システムのパスにインストールしますか？」と聞かれた場合:
+- `y`を選択するとpipを使って`webmd-converter`コマンドがグローバルに使えるようになります
+- `n`を選択した場合は、`python webmd_converter.py`で実行する必要があります
 
 ## 基本的な使い方
 
 1. **基本的な変換**:
 ```bash
-convertmd --url https://example.com
+webmd-converter --url https://example.com
+# または直接実行
+python webmd_converter.py --url https://example.com
 ```
 
 2. **出力先を指定して変換**:
 ```bash
-convertmd --url https://example.com --output-dir ~/my_markdown
+webmd-converter --url https://example.com --output-dir ~/my_markdown
+# または直接実行
+python webmd_converter.py --url https://example.com --output-dir ~/my_markdown
 ```
 
 3. **ヘルプの表示**:
 ```bash
-convertmd -h
+webmd-converter -h
+# または直接実行
+python webmd_converter.py -h
 ```
 
 ## 出力について
 
-- **デフォルトの出力先**: `~/Documents/hp_to_md`
+- **デフォルトの出力先**: `~/Documents/webmd_output`
 - **ファイル形式**: Markdown (.md)
 - **ファイル名**: URLのパスから自動生成
-- **出力例**:
+- **出力例**: [サンプル出力例](examples/example_output.md)
+
 ```markdown
 ---
 title: Example Domain
@@ -84,39 +127,66 @@ source_url: https://example.com
 This domain is for use in illustrative examples...
 ```
 
+プロジェクトの[examples](examples/)ディレクトリには、さらに詳細な変換例が含まれています。
+
 ## トラブルシューティング
 
 よくある問題と解決方法:
 
-1. **`convertmd: command not found`**
+1. **`webmd-converter: command not found`**
 ```bash
-# コマンドへのパスを確認
-echo $PATH
-# 必要に応じて再インストール
-sudo cp convertmd.sh /usr/local/bin/convertmd
-sudo chmod +x /usr/local/bin/convertmd
+# パッケージがインストールされているか確認
+pip list | grep webmd-converter
+# グローバルにインストールしていない場合は、ローカルで実行
+python webmd_converter.py --url https://example.com
+# またはpipでインストール
+pip install -e .
 ```
 
 2. **仮想環境のエラー**
 ```bash
-# convertmd.shの中のVENV_PATHを確認・修正
-sudo nano /usr/local/bin/convertmd
+# 仮想環境が作成されているか確認
+ls -la venv
+# 仮想環境が存在しない場合は再作成
+python3 -m venv venv
+# 仮想環境をアクティベート
+source venv/bin/activate
 ```
 
 3. **権限エラー**
 ```bash
 # 出力ディレクトリの権限を確認
-ls -la ~/Documents/hp_to_md
+ls -la ~/Documents/webmd_output
 # 必要に応じて権限を変更
-chmod 755 ~/Documents/hp_to_md
+chmod 755 ~/Documents/webmd_output
+```
+
+4. **Windowsでの実行エラー**
+```bash
+# WSLを使用してLinux環境で実行
+# または
+# Git Bashを使用して実行
+# Pythonのパスが異なる場合はsetup.shを編集
 ```
 
 ## カスタマイズ
 
 設定の変更方法:
 
-- **出力先の変更**: `hp_to_md.py`の`default`パラメータを編集
-- **変換設定の変更**: `hp_to_md.py`の`url_to_markdown`関数を編集
+- **出力先の変更**: `webmd_converter.py`の`--output-dir`パラメータを編集
+- **変換設定の変更**: `webmd_converter.py`の`url_to_markdown`関数を編集
+
+## pipでインストール（代替方法）
+
+PyPIからパッケージとしてインストールすることもできます:
+
+```bash
+# インストール
+pip install webmd-converter
+
+# 使用例
+webmd-converter --url https://example.com
+```
 
 ## ライセンス
 
@@ -124,6 +194,9 @@ MIT License
 
 ## 貢献について
 
+プロジェクトへの貢献を歓迎します。詳細な貢献ガイドラインは [CONTRIBUTING.md](CONTRIBUTING.md) をご覧ください。
+
+基本的な流れ:
 1. Issueの作成
 2. プルリクエストの手順:
    - フォーク
@@ -132,6 +205,22 @@ MIT License
    - プッシュ (`git push origin feature/amazing-feature`)
    - プルリクエスト作成
 
+## テスト
+
+テストの実行方法:
+
+```bash
+# 仮想環境をアクティベート
+source venv/bin/activate
+
+# ユニットテストの実行
+python -m unittest tests.py
+```
+
 ## 作者
 
-- Your Name (@yourusername)
+- Hiroshi Nishito (@yulikepython)
+
+## 行動規範
+
+このプロジェクトは [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) に準拠しています。参加する際にはこの行動規範に従うことが求められます。
