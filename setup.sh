@@ -1,44 +1,97 @@
 #!/bin/bash
 
-# 仮想環境のセットアップ
-python3 -m venv venv
-source venv/bin/activate
+# WebMD Converter セットアップスクリプト
+echo "WebMD Converter をセットアップしています..."
+
+# Pythonバージョンチェック
+PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+PYTHON_MAJOR=$(echo $PYTHON_VERSION | cut -d'.' -f1)
+PYTHON_MINOR=$(echo $PYTHON_VERSION | cut -d'.' -f2)
+
+if [[ "$PYTHON_MAJOR" -lt 3 || ("$PYTHON_MAJOR" -eq 3 && "$PYTHON_MINOR" -lt 7) ]]; then
+  echo "エラー: Python 3.7以上が必要です。現在のバージョン: $PYTHON_VERSION"
+  echo "Python 3.7以上をインストールしてから再度実行してください。"
+  exit 1
+fi
+
+echo "Python $PYTHON_VERSION を使用します"
+
+# 仮想環境の確認と作成
+if [ -d "venv" ]; then
+  echo "既存の仮想環境を使用します"
+else
+  echo "新しい仮想環境を作成しています..."
+  python3 -m venv venv
+fi
+
+# 仮想環境のアクティベート
+source venv/bin/activate || {
+  echo "仮想環境のアクティベートに失敗しました"
+  echo "Python venvパッケージがインストールされているか確認してください"
+  echo "Ubuntu/Debian: sudo apt install python3-venv"
+  echo "Fedora: sudo dnf install python3-virtualenv"
+  echo "Arch: pacman -S python-virtualenv"
+  exit 1
+}
 
 # 必要なパッケージのインストール
-pip install -r requirements.txt
+echo "依存パッケージをインストールしています..."
+pip install -r requirements.txt || {
+  echo "パッケージのインストールに失敗しました"
+  exit 1
+}
 
 # 現在のディレクトリのパスを取得
 CURRENT_DIR=$(pwd)
 
-# convertmd.shの内容を生成
-cat > convertmd.sh << EOL
-#!/bin/bash
+# 名前変更
+if [[ -f "hp_to_md.py" && ! -f "webmd_converter.py" ]]; then
+  cp hp_to_md.py webmd_converter.py
+  echo "メインスクリプトを webmd_converter.py にコピーしました"
+fi
 
-# 環境設定
-VENV_PATH="${CURRENT_DIR}/venv"
-SCRIPT_PATH="${CURRENT_DIR}/hp_to_md.py"
+# スクリプトに実行権限を付与
+chmod +x webmd_converter.py
 
-# 仮想環境をアクティベート
-source "\$VENV_PATH/bin/activate"
+# インストールの確認
+read -p "システムのパスにインストールしますか？ (y/n): " INSTALL_CONFIRM
+if [[ "$INSTALL_CONFIRM" == "y" || "$INSTALL_CONFIRM" == "Y" ]]; then
+  # pipでインストール
+  pip install -e .
+  echo "pipを使って 'webmd-converter' をインストールしました"
+else
+  echo "システムへのインストールはスキップされました"
+  echo "当ディレクトリから仮想環境で実行できます: python webmd_converter.py --url <URL>"
+fi
 
-# Pythonスクリプトを実行
-python3 "\$SCRIPT_PATH" "\$@"
+# 出力ディレクトリの作成
+DEFAULT_OUTPUT_DIR=$(python3 -c "import os; print(os.path.expanduser('~/Documents/webmd_output'))")
+mkdir -p "$DEFAULT_OUTPUT_DIR" || {
+  echo "警告: 出力ディレクトリの作成に失敗しました"
+  echo "手動で作成してください: mkdir -p $DEFAULT_OUTPUT_DIR"
+}
 
-# 終了コードを保存
-exit_code=\$?
+if [ -d "$DEFAULT_OUTPUT_DIR" ]; then
+  echo "デフォルト出力ディレクトリを作成しました: $DEFAULT_OUTPUT_DIR"
+fi
 
-# 仮想環境を非アクティベート
-deactivate
-
-# スクリプトの終了コードを返す
-exit \$exit_code
-EOL
-
-# convertmd.shに実行権限を付与
-chmod +x convertmd.sh
-
-# システムのパスにインストール
-sudo cp convertmd.sh /usr/local/bin/convertmd
-
+echo ""
+echo "===================================="
 echo "セットアップが完了しました！"
-echo "使用例: convertmd --url https://example.com"
+echo "===================================="
+echo ""
+echo "使用方法:"
+if [[ "$INSTALL_CONFIRM" == "y" || "$INSTALL_CONFIRM" == "Y" ]]; then
+  echo "webmd-converter --url https://example.com"
+else
+  echo "python webmd_converter.py --url https://example.com"
+fi
+echo ""
+echo "ヘルプの表示:"
+if [[ "$INSTALL_CONFIRM" == "y" || "$INSTALL_CONFIRM" == "Y" ]]; then
+  echo "webmd-converter -h"
+else
+  echo "python webmd_converter.py -h"
+fi
+echo ""
+echo "詳細な使用方法については README.md をご覧ください"
