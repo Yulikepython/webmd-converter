@@ -44,12 +44,6 @@ pip install -r requirements.txt || {
 # 現在のディレクトリのパスを取得
 CURRENT_DIR=$(pwd)
 
-# 名前変更
-if [[ -f "hp_to_md.py" && ! -f "webmd_converter.py" ]]; then
-  cp hp_to_md.py webmd_converter.py
-  echo "メインスクリプトを webmd_converter.py にコピーしました"
-fi
-
 # スクリプトに実行権限を付与
 chmod +x webmd_converter.py
 
